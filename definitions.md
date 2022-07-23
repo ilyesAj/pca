@@ -9,7 +9,7 @@ There are two different methods when thinking about how metrics are ingested int
 
 The Pull-based monitoring system, as the name implies, is a monitoring system that actively obtains indicators, and the objects that require monitoring need to have the capability to be accessed remotely.
 
-![](2022-07-21-21-51-48.png)
+![](uploads/2022-07-21-21-51-48.png)
 
 advantages of pull based model:
 
@@ -23,7 +23,7 @@ advantages of pull based model:
 
 Push-based monitoring systems do not actively obtain data, but the monitored objects actively push indicators.
 
-![](2022-07-21-21-52-11.png)
+![](uploads/2022-07-21-21-52-11.png)
 
 advantages of push based model:
 - for a complex networking environement, this strategy is the best suited . (no need to open ports to pull metrics)
@@ -31,7 +31,7 @@ advantages of push based model:
 - easier to manage when you have multiple ingesters 
 ## multi demensional metric
 as systems have become more and more complex, the concept of dimensional metrics, that is, metrics that also include a set of tags or labels (i.e., the dimensions) to provide additional context, emerged. Monitoring systems that support dimensional metrics allow engineers to easily aggregate and analyze a metric across multiple components and dimensions by querying for a specific metric name and filtering and grouping by label.
-![](2022-07-22-01-07-53.png)
+![](uploads/2022-07-22-01-07-53.png)
 -> https://www.timescale.com/blog/four-types-prometheus-metrics-to-collect/
 
 ## Metric cardinality
@@ -45,7 +45,7 @@ if you have a metric `server_responses` that will have two labels:
 
 the metric cardinality will be: 5x2 = 10
 
-![](2022-07-22-17-18-09.png)
+![](uploads/2022-07-22-17-18-09.png)
 
 > you always make sure that your cardinality is not too high to avoid performance issues (the maximum recomanded cardinality is 100 000 )
 

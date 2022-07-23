@@ -256,11 +256,11 @@ for histograms:
 
 ## exporters
 
-![](2022-07-22-19-19-54.png)
+![](uploads/2022-07-22-19-19-54.png)
 
 ## prometheus architecture
 
-![](2022-07-22-19-36-08.png)
+![](uploads/2022-07-22-19-36-08.png)
 Prometheus scrapes metrics from instrumented jobs, either directly or via an intermediary push gateway for short-lived jobs. It stores all scraped samples locally and runs rules over this data to either aggregate and record new time series from existing data or generate alerts. Grafana or other API consumers can be used to visualize the collected data.
 
 > Each scrape only transfers the current value of every time series of a target to Prometheus, so the scrape interval determines the final sampling frequency of the stored data. The target processes do not retain any historical metrics data themselves.
@@ -312,4 +312,4 @@ In control theory, observability is a measure of how well internal states of a s
     - Logging: details of individual events at the system.
 
     - Tracing: a higher level. Scope of requests/transactions and all the steps involved.
-![](2022-07-21-21-23-16.png)
+![](uploads/2022-07-21-21-23-16.png)
