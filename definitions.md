@@ -1,6 +1,21 @@
+## math
+### rate
+A comparison of two related quantities.
+
+Often the second quantity is time (per second, per hour, etc) but it can be anything.
+### quantiles
+ a quantile is where a sample is divided into equal-sized, adjacent, subgroups (that's why it's sometimes called a “fractile“). It can also refer to dividing a probability distribution into areas of equal probability.
+### median 
+is quantile that split the date into groups that contains the same number of data points.
+this is called 0.5 quantile
+### percentile
+Percentiles are given as percent values, values such as 95%, 40%, or 27%. Quantiles are given as decimal values, values such as 0.95, 0.4, and 0.27. The 0.95 quantile point is exactly the same as the 95th percentile point.
+### why 0.95 quantile matters ?
+The 95th percentile basically says that 95 percent of the time your usage is at or below it, and the other 5 percent of the time it exceeds it.
+-> https://opmantek.com/what-is-the-95th-percentile-and-why-does-it-matter/
 ## metric && time series 
 
-In layperson terms, metrics are numeric measurements. Time series means that changes are recorded over time. What users want to measure differs from application to application. For a web server it might be request times, for a database it might be number of active connections or number of active queries etc.
+In layperson terms, metrics are nuquantilesmeric measurements. Time series means that changes are recorded over time. What users want to measure differs from application to application. For a web server it might be request times, for a database it might be number of active connections or number of active queries etc.
 
 ## pull model vs push model 
 There are two different methods when thinking about how metrics are ingested into a monitoring system: either the metrics get pushed (usually via UDP) into the system or they get pulled (usually via HTTP).

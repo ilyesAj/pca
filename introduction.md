@@ -24,34 +24,31 @@ Every metric has a unique identifier that can have labels with their respective 
 
 metric name may contain ASCII letters and digits, as well as underscores and colons. It must match the regex [a-zA-Z_:][a-zA-Z0-9_:]*.
 
-
-
 ### samples
 
 Samples form the actual time series data. Each sample consists of:
 
--    a float64 value
--    a millisecond-precision timestamp
-
-
+- a float64 value
+- a millisecond-precision timestamp
 
 ### Querying metrics
 
 The syntax to query for data is as follows:
- ```
+
+ ```promql
 <metric_name>{<label_name>=<label_value>, ...}
 ```
+
 This query will return all time-series of the metric metric_name matching the labels in the condition.
 > This is the same notation that OpenTSDB uses.
 
 ## metric
 
-
-ther is mainly 4 different metric type in prometheus 
+there is mainly 4 different metric type in prometheus
 
 ### Counter
 
-A _counter_ is a cumulative metric that represents a single [monotonically 
+A _counter_ is a cumulative metric that represents a single [monotonically
 increasing counter](https://en.wikipedia.org/wiki/Monotonic_function) **whose value can only increase or be reset to zero on restart** For example, you can
 use a counter to represent the number of requests served, tasks completed, or
 errors.
@@ -70,50 +67,45 @@ concurrent requests.
 ### Histogram ???
 
 A _histogram_ samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
-
+the histogram metric will allow you to track the distribution of the size of events, allowing you to calculate quantiles from them.
 A histogram with a base metric name of `<basename>` exposes multiple time series
 during a scrape:
 
-  * cumulative counters for the observation buckets, exposed as `<basename>_bucket{le="<upper inclusive bound>"}`
-  * the **total sum** of all observed values, exposed as `<basename>_sum`
-  * the **count** of events that have been observed, exposed as `<basename>_count` (identical to `<basename>_bucket{le="+Inf"}` above)
+- cumulative counters for the observation buckets, exposed as `<basename>_bucket{le="<upper inclusive bound>"}`
+- the **total sum** of all observed values, exposed as `<basename>_sum`
+- the **count** of events that have been observed, exposed as `<basename>_count` (identical to `<basename>_bucket{le="+Inf"}` above)
 
 Use the
 [`histogram_quantile()` function](/docs/prometheus/latest/querying/functions/#histogram_quantile)
-to calculate quantiles from histograms or even aggregations of histograms. A
-histogram is also suitable to calculate an
-[Apdex score](http://en.wikipedia.org/wiki/Apdex). When operating on buckets,
+to calculate quantiles from histograms or even aggregations of histograms. When operating on buckets,
 remember that the histogram is
-[cumulative](https://en.wikipedia.org/wiki/Histogram#Cumulative_histogram). See
-[histograms and summaries](/docs/practices/histograms) for details of histogram
-usage and differences to [summaries](#summary).
+[cumulative](https://en.wikipedia.org/wiki/Histogram#Cumulative_histogram).
+Prometheus stores histograms internally in buckets that have a max size (labeled le), but no minimum size. You must configure the number and max size of each bucket ahead of time. Each bucket time series will contain the count of observations that was **less than or equal to its le value for a given timestamp.**
 
-### Summary ????
+### Summary
 
 Similar to a _histogram_, a _summary_ samples observations (usually things like
 request durations and response sizes). While it also provides a total count of
-observations and a sum of all observed values, it calculates configurable
+observations _count and a sum of all observed values_sum, it calculates configurable
 quantiles over a sliding time window.
 
 A summary with a base metric name of `<basename>` exposes multiple time series
 during a scrape:
 
-  * streaming **φ-quantiles** (0 ≤ φ ≤ 1) of observed events, exposed as `<basename>{quantile="<φ>"}`
-  * the **total sum** of all observed values, exposed as `<basename>_sum`
-  * the **count** of events that have been observed, exposed as `<basename>_count`
+- streaming **φ-quantiles** (0 ≤ φ ≤ 1) of observed events, exposed as `<basename>{quantile="<φ>"}`
+- the **total sum** of all observed values, exposed as `<basename>_sum`
+- the **count** of events that have been observed, exposed as `<basename>_count`
 
-See [histograms and summaries](/docs/practices/histograms) for
-detailed explanations of φ-quantiles, summary usage, and differences
-to [histograms](#histogram).
+> The essential difference between summaries and histograms is that summaries calculate streaming φ-quantiles on the client side and expose them directly, while histograms expose bucketed observation counts and the calculation of quantiles from the buckets of a histogram happens on the server side using the histogram_quantile() function.
 
 ## labels
 
-lebels are key value pairs associated with time series that in addition to the metric name , uniquely identify them .
+labels are key value pairs associated with time series that in addition to the metric name , uniquely identify them .
 
 there is two types of labels :
 
 - Instrumentation labels: as the name indicates, come from your instrumentation . they are labels know internally by your application or library such as the type of http request that you received, which database is talking to, which method is called ...
-- Target labels: identifies the envirnoment that your application leaves in: which region , which datacenter, which team own it ...
+- Target labels: identifies the environment that your application leaves in: which region , which datacenter, which team own it ...
 
 > target labels comes from service discovery.
 
@@ -122,7 +114,7 @@ Label names may contain ASCII letters, numbers, as well as underscores. They mus
 > A label with an empty label value is considered equivalent to a label that does not exist.
 > the label names used for a metric should not change during the lifetime of an application process. if you feel the need for this you probably want a log based monitoring solution for that use case.
 
-## label paterns
+## label patterns
 
 label values can only be string . in this section we will work you through the different patterns that we can use in labeling
 
@@ -136,7 +128,7 @@ the best solution would be to add a label for the state to the gauge .
 
 for example:
 
-```
+```promql
 resource_state{resource_state="RUNNING", app_name="nginx"} 0
 resource_state{resource_state="STARTING", app_name="nginx"} 1
 resource_state{resource_state="STOPPING", app_name="nginx"} 0
@@ -152,13 +144,11 @@ The convention that has emerged is to use a gauge with the value 1 and all the a
 
 For instance:
 
-```
+```promql
 resource_info{build_version="1.253",version="5.3.2" } 1.0
 ```
 
 ## Exposition format
-
-
 
 Metrics can be exposed to Prometheus using a simple text-based exposition format.
 
@@ -183,7 +173,7 @@ Prometheus' text-based format is line oriented. Lines are separated by a line fe
 
 > escape is done by a backslash. for example \\ and \\n
 
-```
+```promql
 metric_name [
   "{" label_name "=" `"` label_value `"` { "," label_name "=" `"` label_value `"` } [ "," ] "}"
 ] value [ timestamp ]
@@ -191,10 +181,10 @@ metric_name [
 
 In the sample syntax:
 
-*  `metric_name` and `label_name` carry the usual Prometheus expression language restrictions.
-* `label_value` can be any sequence of UTF-8 characters, but the backslash (`\`), double-quote (`"`), and line feed (`\n`) characters have to be escaped as `\\`, `\"`, and `\n`, respectively.
-* `value` is a float represented as required by Go's [`ParseFloat()`](https://golang.org/pkg/strconv/#ParseFloat) function. In addition to standard numerical values, `NaN`, `+Inf`, and `-Inf` are valid values representing not a number, positive infinity, and negative infinity, respectively.
-* The `timestamp` is an `int64` (milliseconds since epoch, i.e. 1970-01-01 00:00:00 UTC, excluding leap seconds), represented as required by Go's [`ParseInt()`](https://golang.org/pkg/strconv/#ParseInt) function.
+- `metric_name` and `label_name` carry the usual Prometheus expression language restrictions.
+- `label_value` can be any sequence of UTF-8 characters, but the backslash (`\`), double-quote (`"`), and line feed (`\n`) characters have to be escaped as `\\`, `\"`, and `\n`, respectively.
+- `value` is a float represented as required by Go's [`ParseFloat()`](https://golang.org/pkg/strconv/#ParseFloat) function. In addition to standard numerical values, `NaN`, `+Inf`, and `-Inf` are valid values representing not a number, positive infinity, and negative infinity, respectively.
+- The `timestamp` is an `int64` (milliseconds since epoch, i.e. 1970-01-01 00:00:00 UTC, excluding leap seconds), represented as required by Go's [`ParseInt()`](https://golang.org/pkg/strconv/#ParseInt) function.
 
 ### Comments, help text, and type information
 
@@ -208,7 +198,7 @@ it is recommanded to use HELP and TYPE comment when exposing metrics.
 
 ### text format example
 
-```
+```promql
 # HELP http_requests_total The total number of HTTP requests.
 # TYPE http_requests_total counter
 http_requests_total{method="post",code="200"} 1027 1395066363000
@@ -279,7 +269,7 @@ The Prometheus ecosystem consists of multiple components, many of which are opti
 - no horizental scalibility
 - prometheus is not suitable for storing event logs
 - prometheus is not suitable for data with high cardinality like usernames && passwords
-- prometheus prefered to have 99.9% of accurency (due to bad scrapes, etc) which make him not suitable for billing like billing per request.
+- prometheus preferred to have 99.9% of accuracy (due to bad scrapes, etc) which make him not suitable for billing like billing per request.
 
 ## exporters
 
@@ -289,27 +279,25 @@ A Prometheus Exporter is a piece of software that
 - Can turn those statistics into Prometheus metrics, using a client library
 - Starts a web server that exposes a /metrics URL, and have that URL display the system metrics
 
-recommandations when writing exporters:
+recommendations when writing exporters:
+
 - respect metric naming
 - if you can determine metric type, put it as untyped
 - expose raw metrics rather than calculate on the application side
 - no caching
-- create new metric is prefered
+- create new metric is preferred
 - Avoid type as a label name, it’s too generic and often meaningless. You should also try where possible to avoid names that are likely to clash with target labels, such as region, zone, cluster, availability_zone, az, datacenter, dc, owner, customer, stage, service, environment and env.
 
 ## structuring and naming metric
 
-https://prometheus.io/docs/practices/naming/
+<https://prometheus.io/docs/practices/naming/>
 
 ## observability
 
 What is Observability?
 
 In control theory, observability is a measure of how well internal states of a system can be inferred from knowledge of its external outputs. In general terms, a system is observable if you can check how well its functioning internally. This can be achieved by different means:
-
-    - Metrics: the atomic pieces at a system that are measurable and aggregatable.
-
+    - Metrics: the atomic pieces at a system that are measurable and aggregative.
     - Logging: details of individual events at the system.
-
     - Tracing: a higher level. Scope of requests/transactions and all the steps involved.
 ![](uploads/2022-07-21-21-23-16.png)
