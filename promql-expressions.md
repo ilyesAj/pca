@@ -76,6 +76,10 @@ the inner query will output 1 if the process have more than 10 fds or 0 if less.
 
 -> get all the instances that have there open file descriptors more the 0.0001 of the max file descriptors.
 
+-how many processes were started this year
+`sum((year(process_start_time_seconds)) ==bool scalar(year()))`
+
+
 ## notes
 
 - when using counter, tou must use rate befor agregating

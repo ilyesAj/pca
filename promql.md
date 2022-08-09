@@ -339,6 +339,41 @@ The following list shows the precedence of binary operators in Prometheus, from 
 
 Operators on the same precedence level are left-associative. For example, 2 *3 % 2 is equivalent to (2* 3) % 2. However ^ is right associative, so 2 ^ 3 ^ 2 is equivalent to 2 ^ (3 ^ 2).
 
+## functions
+
+- vector: vector(1) will reproduce {} 1
+- scalar: convert to scalare: scalar(year())
+- abs: absolute value of the vector
+- ln,log2,log10: take an instant vector and return a logarithm
+- exp: natural exponent (the inverse of ln function)
+- sqrt: return the square of the values in an instant vector
+- ceil and floor: round up for ceil and rounds down for floor . `ceil(vector(0.1))` will return `{} 1`.
+- round: rounds to the nearest integer. this function can have an additional scalar as a parameter: `round(vector(2100),1000)` will return `{} 2000`
+- clamp_max and clamp_min: used to override the max and the min of the time serie value. For example if you want that your metric will have the minimum of 10 even though the real value is 5 you can use `clamp_min`.
+  ![](uploads/2022-07-25-18-42-45.png)
+  ![](uploads/2022-07-25-18-43-04.png)
+- time: will return the current UTC time in the epoch linux format.
+  > the prometheus approach is to expose the unix time in seconds at which something of interest happen.
+- minute, hour, day_of_week, day_of_month, days_in_month, month, year:  like the name of the functions, month() will return the current month. you can also use those functions directly with instant vectors `year(process_start_time_seconds)` will return the year that processes has started
+  > day of week starts from sunday 0
+- timestamp: returns the timestamp of the time series it self not the value
+- absent: not operator
+- sort and sort_desc: used for sorting
+- rate: returns how fast a counter is increasing per second for each time series.
+  > rate take into account counter reset, if for example you have [5,6,(restart)2,3] , rate will consider it as [5,6,8,11]
+  > it is recommended to always use the same period of time when using rate
+- increase: This function is exactly equivalent to rate() except that it does not convert the final unit to "per-second" (1/s). Instead, the final output unit is per-provided-time-window. Example: increase(http_requests_total[5m]) yields the total increase in handled HTTP requests over a 5-minute window (unit: 1 / 5m). Thus increase(foo[5m]) / (5 * 60) is 100% equivalent to rate(foo[5m]).
+- irate: like rate, that returns a per second rate but much simpler. it will look two the last two samples instead of the whole range vector. the advantage of that is that it more sensitive to change . The advantages is that it's not recommanded to use it in alerts since it generates spikes and dips also on zoomed out graphs
+
+--- used on gauges
+- changes: will count how many times a gauge has changed value
+- deriv:(linear regression) calculates the per-second derivative of the time series in a **range vector** 
+  ![](uploads/2022-07-25-19-54-13.png)
+- predict_linear: will predict what value of a gauge it will have in the future based on previous results
+ ![](uploads/2022-07-25-19-58-59.png)
+## aggregation over time 
+aggregations works mostly on instant vector. if you want to calculate the max for example over a period of time younned to use max_over_time with a range vector : `max_over_time(process_resident_memory_bytes[1h])`
+> rate already calculate the avg_over_time, you can use directly rate(coco[1h])
 ## references
 
 - <https://promlabs.com/blog/2020/07/02/selecting-data-in-promql>

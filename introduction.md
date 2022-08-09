@@ -64,7 +64,7 @@ Gauges are typically used for measured values like temperatures or current
 memory usage, but also "counts" that can go up and down, like the number of
 concurrent requests.
 
-### Histogram ???
+### Histogram 
 
 A _histogram_ samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
 the histogram metric will allow you to track the distribution of the size of events, allowing you to calculate quantiles from them.
@@ -244,9 +244,7 @@ for histograms:
 
 > metric and labels names cannot start with a number and connot contain hyphens (-)
 
-## exporters
 
-![](uploads/2022-07-22-19-19-54.png)
 
 ## prometheus architecture
 
@@ -273,6 +271,8 @@ The Prometheus ecosystem consists of multiple components, many of which are opti
 
 ## exporters
 
+![](uploads/2022-07-22-19-19-54.png)
+
 A Prometheus Exporter is a piece of software that
 
 - Can fetch statistics from another, non-Prometheus system
@@ -290,7 +290,20 @@ recommendations when writing exporters:
 
 ## structuring and naming metric
 
-<https://prometheus.io/docs/practices/naming/>
+
+
+the overall structure of a metric name is generally:
+```
+ library_name_unit_suffix
+```
+
+- a metric must start with a letter and can be followed with any number of letters, numbers and underscores
+  > `:` can be used in the metric name but by convention it's reserved to recording rules.
+- by convention using snake case is recommanded. For example, if you have `my awesome metric` , you need to declare it as `my_awesome_metric`
+- suffixes `_sum` `_count` `_total` are used by summary and historgrams metrics. it is recommanded to avoid them
+- should have a suffix describing the unit, in **plural** form
+- should have a (single-word) application prefix relevant to the domain the metric belongs to like `prometheus_http_request`
+- should use base units (e.g. seconds, bytes, meters )
 
 ## observability
 
@@ -301,3 +314,7 @@ In control theory, observability is a measure of how well internal states of a s
     - Logging: details of individual events at the system.
     - Tracing: a higher level. Scope of requests/transactions and all the steps involved.
 ![](uploads/2022-07-21-21-23-16.png)
+
+## references
+
+- https://prometheus.io/docs/practices/naming/
